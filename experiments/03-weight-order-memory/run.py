@@ -1,10 +1,10 @@
 """Evaluate tiny-learners 03 "weight-order memory": all arms, controls, ablations, verdict.
 
-  python run.py            evaluate the trained checkpoints in ckpt/ (GPU; one process per seed)
+  python run.py            evaluate the trained checkpoints in ckpt/ (GPU; one process, seeds in turn)
   python run.py --quick    <30 s plumbing check on a tiny untrained model (CPU ok, no verdict claim)
   python run.py --clean    delete caches, quick results (add --all to delete checkpoints too)
 """
-import argparse, json, os, shutil, subprocess, sys, time
+import argparse, json, os, shutil, sys, time
 import numpy as np
 import torch
 
@@ -19,7 +19,7 @@ SEEDS = (0, 1, 2)
 ARMS_MAIN = ("A", "B", "Bq", "P1", "P2", "M", "R", "oracle")
 LR_GRID = (3e-4, 1e-3, 3e-3, 1e-2, 3e-2)
 MASK_GRID = (0.005, 0.02, 0.05)
-FULL = dict(n_val=64, n_test=150, n_sweep=100, n_abl=48, n_ret=100, streams=8, stream_len=20,
+FULL = dict(n_val=48, n_test=100, n_sweep=64, n_abl=48, n_ret=100, streams=8, stream_len=20,
             same_rule_streams=16, chunk=50, steps=10, oracle_steps=100)
 QUICK = dict(n_val=8, n_test=8, n_sweep=8, n_abl=4, n_ret=8, streams=2, stream_len=3,
              same_rule_streams=2, chunk=8, steps=2, oracle_steps=3)
@@ -339,7 +339,6 @@ def main():
     ap.add_argument("--quick", action="store_true")
     ap.add_argument("--clean", action="store_true")
     ap.add_argument("--all", action="store_true", help="with --clean: also delete checkpoints")
-    ap.add_argument("--eval-seed", type=int)
     a = ap.parse_args()
     if a.clean:
         freed = 0
@@ -367,16 +366,16 @@ def main():
         return
     if not torch.cuda.is_available():
         sys.exit("No CUDA GPU found. Full evaluation runs on Fortran's GPU.")
-    if a.eval_seed is not None:
-        r = eval_seed(a.eval_seed, FULL, "cuda")
-        with open(os.path.join(RES, f"seed{a.eval_seed}.json"), "w") as f:
-            json.dump(r, f, indent=1, default=lambda o: o.tolist() if hasattr(o, "tolist") else str(o))
-        return
     os.makedirs(RES, exist_ok=True)
+    torch.set_num_threads(2)
     t0 = time.time()
-    procs = [subprocess.Popen([sys.executable, __file__, "--eval-seed", str(s)]) for s in SEEDS]
-    if max(p.wait() for p in procs):
-        sys.exit("an evaluation process failed")
+    for s in SEEDS:              # one process, one seed at a time (keeps system RAM low)
+        r = eval_seed(s, FULL, "cuda")
+        with open(os.path.join(RES, f"seed{s}.json"), "w") as f:
+            json.dump(r, f, indent=1, default=lambda o: o.tolist() if hasattr(o, "tolist") else str(o))
+        print(f"seed {s} evaluated in {r['eval_sec'] / 60:.1f} min, peak RAM {r['peak_ram_gb']:.2f} GB, "
+              f"GPU peak {r['gpu_peak_gb']:.2f} GB", flush=True)
+        torch.cuda.empty_cache()
     eval_min = (time.time() - t0) / 60
     per_seed = [json.load(open(os.path.join(RES, f"seed{s}.json"))) for s in SEEDS]
     infos = [json.load(open(os.path.join(CKPT, f"seed{s}", "train_info.json"))) for s in SEEDS]
@@ -385,7 +384,7 @@ def main():
                   kept_mb=dir_mb(CKPT), base_train_min=train_min,
                   total_gpu_min=train_min + eval_min,
                   adapt_ms=float(np.mean([r["adapt_ms_P1"] for r in per_seed])),
-                  peak_ram_gb=max(r["peak_ram_gb"] for r in per_seed))
+                  peak_ram_gb=max([r["peak_ram_gb"] for r in per_seed] + [i.get("peak_ram_gb", 0) for i in infos]))
     m = aggregate(per_seed, budget)
     rows, v, gate, notes = criteria.verdict(m)
     write_report(m, rows, v, gate, notes, per_seed, RES)

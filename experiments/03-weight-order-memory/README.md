@@ -15,7 +15,7 @@ Validity gate (else INCONCLUSIVE): moving whole neurons with their outgoing weig
 
 ## How it works
 
-- **Model:** 7.5 M-parameter transformer (~15 MB fp16), trained ~7 min to solve few-shot problems in context. The *adaptive block* is the MLP input matrix of the last 2 layers (0.82 M weights).
+- **Model:** 7.5 M-parameter transformer (~15 MB fp16), trained 5 min (3 seeds sharing one process) to solve few-shot problems in context. The *adaptive block* is the MLP input matrix of the last 2 layers (0.82 M weights).
 - **Tasks** (generated, no downloads): T1 `y = (a·x + b) mod 17` with 25% of rules held out · T2 new key→value facts · T3 grid transforms with held-out combinations · T4 addition in an unseen number base (exploratory).
 - **Arms:** A frozen · B fine-tune · B′ fine-tune squeezed to the bits a reordering carries (≈ 7 bits/weight) · **P1** sort-reorder: fine-tune a shadow copy, then re-order each row of the *original* values to follow its ranking (the closest pure reordering) · **P2** learned reorder: a 0.3 M-param controller reads the prompt and proposes the ranking · M mask ("pause" weights) · R random reorder (control) · oracle (100-step fine-tune).
 - **Ablations:** reorder within rows / whole matrix / whole neurons; early vs late layers; block size (0.1 / 0.4 / 0.8 M weights → accuracy per bit); timing (adapt before vs after answering) in a same-rule stream.
@@ -25,7 +25,7 @@ Validity gate (else INCONCLUSIVE): moving whole neurons with their outgoing weig
 ## Run
 
 ```bash
-python train.py            # GPU only: 3 seeds in parallel, ~9 min, writes ckpt/
+python train.py            # GPU only: one process, 3 seeds take turns, 5 min total, writes ckpt/
 python run.py              # GPU: all arms, controls, ablations -> verdict table + results/
 python run.py --quick      # < 30 s plumbing check on a tiny untrained model (CPU ok)
 python run.py --clean      # caches + quick results (--all also deletes ckpt/)
