@@ -4,4 +4,4 @@ __pycache__/
 .pytest_cache/
 data/
 ckpt/
-results/quick/
+**/results/quick/
