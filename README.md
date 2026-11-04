@@ -6,6 +6,7 @@ Tiny models (≤ 20 MB) that **learn while they are being used**: from the promp
 
 | # | Experiment | Verdict | Criteria | One-line finding |
 |---|---|---|---|---|
+| 02 | [Learn while prompted](experiments/02-learn-while-prompted): a 20 MB model learns new rules and facts from its prompt, and keeps improving past what it trained on | _pending GPU run_ | – | – |
 | 03 | [Weight-order memory](experiments/03-weight-order-memory): adapt by *reordering* weights, not rewriting them | _pending GPU run_ | – | – |
 
 Every experiment pre-registers PASS / FAIL criteria and negative controls before any run, and prints a verdict table (PASS / FAIL / INCONCLUSIVE, plus an optional ✨ INTRIGUING tag that never changes the verdict).
