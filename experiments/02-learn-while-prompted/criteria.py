@@ -17,23 +17,25 @@ HYPOTHESIS = (
 ASSUMPTIONS = [
     "Modular-arithmetic rules and random lookup tables are fair stand-ins for 'a new rule' and "
     "'new facts': generated per prompt, so nothing can be memorized from training.",
-    "5M parameters and a 14-minute GPU budget shared by all arms are enough capacity and time.",
+    "5M parameters and a 5-minute GPU budget shared by all arms are enough capacity and time.",
     "First-order-style meta-learning through 2 inner steps is stable at this size.",
 ]
 
 BUDGET = {
     "model_mb_fp32": 20.0,       # each model's weights at fp32
     "artifacts_mb": 50.0,        # all kept checkpoints together (stored fp16)
-    "train_minutes_arm": 15.0,   # each arm, on Fortran's GPU
-    "train_minutes_total": 20.0,  # all arms together, wall-clock
+    # Tightened before any GPU run (2026-11-04, Obi: "about 5 minutes, never more than 10"):
+    # was 15 min per arm / 20 min total in the approved plan.
+    "train_minutes_arm": 10.0,   # each arm, on Fortran's GPU
+    "train_minutes_total": 10.0,  # all arms together, wall-clock
     "adapt_seconds": 1.0,        # learning one 16-example prompt (arm C), on GPU
     "quick_seconds": 60.0,       # run.py --quick in CI
 }
 
 CRITERIA = [
     {"id": "C1", "name": "Fits the budget",
-     "desc": "Each model <= 20 MB, all artifacts <= 50 MB, <= 15 min/arm and <= 20 min total GPU "
-             "training, <= 1 s to learn one prompt", "metric": "budget_ok", "op": "==", "threshold": 1},
+     "desc": "Each model <= 20 MB, all artifacts <= 50 MB, <= 10 min total GPU training, "
+             "<= 1 s to learn one prompt", "metric": "budget_ok", "op": "==", "threshold": 1},
     {"id": "C2", "name": "Learns new rules (T1)",
      "desc": "Best arm on held-out rules at k=8 (ideal learner ~100%); curve rises over k=0..8 "
              "(Spearman >= 0.9)", "metric": "c2_ok", "op": "==", "threshold": 1},
@@ -102,7 +104,7 @@ def score(m: dict) -> tuple[list[dict], dict[str, bool], bool]:
     passed["C1"] = bool(c1)
     rows.append(("C1", f"{b['model_mb_fp32_max']:.1f} MB/model, {b['artifacts_mb']:.1f} MB total, "
                  f"{b['train_minutes_arm_max']:.1f}/{b['train_minutes_total']:.1f} min, "
-                 f"{b['adapt_seconds']:.2f} s/prompt", "20 MB, 50 MB, 15/20 min, 1 s"))
+                 f"{b['adapt_seconds']:.2f} s/prompt", "20 MB, 50 MB, 10/10 min, 1 s"))
 
     best2 = max(arms, key=lambda a: acc[a]["rules_heldout"]["8"])
     ks = [k for k in m["k_list"] if k <= 8]

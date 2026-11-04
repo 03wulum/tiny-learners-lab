@@ -1,15 +1,15 @@
 """Train the arms on the NVIDIA GPU, all in ONE process (one CUDA context, low system RAM).
 
 Arms take turns step by step, each getting a fixed share of the wall-clock budget, so the
-whole run finishes in --minutes (default 14). Prompts are generated on the GPU; nothing
+whole run finishes in --minutes (default 5; Obi's rule: about 5, never more than 10). Prompts are generated on the GPU; nothing
 large lives in system RAM. If system RAM use passes --ram-limit percent, training stops
 early and saves what it has.
 
 Training never runs on CPU (Obi's rule). The only CPU path is --smoke: 3 steps of toy-size
 models to check the code; it saves nothing unless --out is given.
 
-    python train.py                      # all arms, 14 min total, on Fortran's GPU
-    python train.py --arms A C --minutes 6
+    python train.py                      # all arms, 5 min total, on Fortran's GPU
+    python train.py --arms A C --minutes 3
     python train.py --smoke              # code check, any machine
 """
 from __future__ import annotations
@@ -87,8 +87,9 @@ class ArmState:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--arms", nargs="*", default=list(TRAINED), choices=list(TRAINED))
-    ap.add_argument("--minutes", type=float, default=14.0, help="total wall-clock budget, all arms")
-    ap.add_argument("--batch-scale", type=float, default=1.0, help="multiply every arm's batch size")
+    ap.add_argument("--minutes", type=float, default=5.0, help="total wall-clock budget, all arms (max 10)")
+    ap.add_argument("--batch-scale", type=float, default=None,
+                    help="multiply every arm's batch size (default: from free GPU memory)")
     ap.add_argument("--ram-limit", type=float, default=85.0, help="stop early above this system RAM %%")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--out", type=Path, default=None)
@@ -98,12 +99,18 @@ def main():
     if not a.smoke and not torch.cuda.is_available():
         sys.exit("Refusing to train on CPU: this experiment trains on an NVIDIA GPU only. "
                  "Use --smoke for a 3-step code check.")
+    if a.minutes > 10:
+        sys.exit("Training budget is capped at 10 minutes (Obi's rule).")
     dev = "cuda" if torch.cuda.is_available() and not a.smoke else "cpu"
     if dev == "cuda":
         torch.backends.cuda.matmul.allow_tf32 = True
         free, total = torch.cuda.mem_get_info()
         print(f"GPU: {torch.cuda.get_device_name(0)}, {free / 1e9:.1f} of {total / 1e9:.1f} GB free; "
               f"system RAM {ram_percent():.0f}% used", flush=True)
+        if a.batch_scale is None:  # one training at a time: use the GPU's free memory
+            a.batch_scale = 4.0 if free > 16e9 else 2.0 if free > 8e9 else 1.0 if free > 4e9 else 0.5
+    if a.batch_scale is None:
+        a.batch_scale = 1.0
     amp = dev == "cuda" and torch.cuda.is_bf16_supported()
     total_s = a.minutes * 60
     shares = {arm: SHARE[arm] for arm in a.arms}

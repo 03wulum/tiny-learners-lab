@@ -7,7 +7,7 @@
 
 | # | Criterion | Threshold | Result | PASS/FAIL |
 |---|---|---|---|---|
-| C1 | Fits the budget | each model ≤ 20 MB, all ≤ 50 MB, ≤ 15 min per arm and ≤ 20 min total GPU training, ≤ 1 s to learn one prompt | | |
+| C1 | Fits the budget | each model ≤ 20 MB, all ≤ 50 MB, ≤ 10 min total GPU training (tightened from 15/20 before any run, per Obi's 5-10 minute rule), ≤ 1 s to learn one prompt | | |
 | C2 | Learns new rules (T1) | best arm ≥ 80% on held-out rules at k=8, rising curve (Spearman ≥ 0.9) | | |
 | C3 | Learns new facts (T2) | best arm ≥ 90% recall at k=16, unseen keys within 3 pts of chance | | |
 | C4 | **Keeps improving past its training (headline)** | best of C/D at k=64 ≥ 80% of the ideal learner and ≥ arm A + 15 pts | | |
@@ -51,7 +51,7 @@ python -m pytest -q          # code tests, seconds, never trains
 python run.py --quick        # smoke check with tiny UNTRAINED models (~5 s, CPU is fine)
 
 # On an NVIDIA GPU only (training refuses to run on CPU):
-python train.py              # all 5 arms in ONE process taking turns on the GPU, 14 min total
+python train.py              # all 5 arms in ONE process taking turns on the GPU, 5 min total
 python run.py                # evaluate every arm, print the PASS/FAIL table, write results/
 python demo.py               # watch arm C learn a rule it has never seen, one example at a time
 python demo.py --teach "1:5 2:8 3:11"   # teach it your own examples
@@ -78,4 +78,4 @@ A 4-minute probe before the plan (a 104K-param model, on CPU before the GPU-only
 
 ## Limitations
 
-Synthetic tasks over 17-32 symbols, not language. One seed per arm, and the five arms share one 14-minute GPU budget (the 5M arms get 2.5 to 4 minutes each). Arm D gets no test-time optimizer, so C vs D compares two kinds of update rule, not equal compute.
+Synthetic tasks over 17-32 symbols, not language. One seed per arm, and the five arms share one 5-minute GPU budget (the 5M arms get about 1-1.5 minutes each). Arm D gets no test-time optimizer, so C vs D compares two kinds of update rule, not equal compute.
