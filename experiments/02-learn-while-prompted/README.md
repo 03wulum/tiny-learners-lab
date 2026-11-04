@@ -51,7 +51,7 @@ python -m pytest -q          # code tests, seconds, never trains
 python run.py --quick        # smoke check with tiny UNTRAINED models (~5 s, CPU is fine)
 
 # On an NVIDIA GPU only (training refuses to run on CPU):
-python train_all.py          # all 5 trained arms in parallel, 12 min cap each, ~13 min wall-clock
+python train.py              # all 5 arms in ONE process taking turns on the GPU, 14 min total
 python run.py                # evaluate every arm, print the PASS/FAIL table, write results/
 python demo.py               # watch arm C learn a rule it has never seen, one example at a time
 python demo.py --teach "1:5 2:8 3:11"   # teach it your own examples
@@ -67,10 +67,10 @@ Checkpoints are saved in fp16 (about 31 MB for all five) to `ckpt/`, which git i
 | `models.py` | the transformer and fast-weight memory models, with the per-prompt adapter |
 | `ttt.py` | leave-one-out test-time training |
 | `arms.py` | arm definitions, checkpoint save/load |
-| `train.py`, `train_all.py` | GPU training, one arm or all at once |
+| `train.py`, `gpu_tasks.py` | GPU training (one process, prompts generated on the GPU, stops early if system RAM passes 85%) |
 | `run.py`, `criteria.py`, `plots.py` | evaluation, pre-registered criteria, plots |
 | `demo.py` | interactive demo |
-| `test_learn.py` | 18 code tests: masks, leaks, gradients, budgets, verdict logic |
+| `test_learn.py` | 19 code tests: masks, leaks, gradients, budgets, verdict logic |
 
 ## Background
 
@@ -78,4 +78,4 @@ A 4-minute probe before the plan (a 104K-param model, on CPU before the GPU-only
 
 ## Limitations
 
-Synthetic tasks over 17-32 symbols, not language. One seed per arm (12 minutes of GPU each). Arm D gets no test-time optimizer, so C vs D compares two kinds of update rule, not equal compute.
+Synthetic tasks over 17-32 symbols, not language. One seed per arm, and the five arms share one 14-minute GPU budget (the 5M arms get 2.5 to 4 minutes each). Arm D gets no test-time optimizer, so C vs D compares two kinds of update rule, not equal compute.

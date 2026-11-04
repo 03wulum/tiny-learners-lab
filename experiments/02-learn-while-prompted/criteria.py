@@ -17,7 +17,7 @@ HYPOTHESIS = (
 ASSUMPTIONS = [
     "Modular-arithmetic rules and random lookup tables are fair stand-ins for 'a new rule' and "
     "'new facts': generated per prompt, so nothing can be memorized from training.",
-    "5M parameters and 12 minutes on one consumer NVIDIA GPU are enough capacity and time.",
+    "5M parameters and a 14-minute GPU budget shared by all arms are enough capacity and time.",
     "First-order-style meta-learning through 2 inner steps is stable at this size.",
 ]
 

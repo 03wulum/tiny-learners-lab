@@ -165,3 +165,20 @@ def test_quad_family_differs_from_affine():
     x = np.arange(P)[None]
     ab = np.array([[3, 4]])
     assert not np.array_equal(apply_rule("quad", ab, x), apply_rule("affine", ab, x))
+
+
+def test_gpu_task_generator_matches_rules_and_facts():
+    from gpu_tasks import GpuTasks
+    gt = GpuTasks("cpu", seed=0)
+    px, py, pv, qx, qy = gt.mixed(16, 6, 6, prefix=False)
+    train = {tuple(r) for r in TRAIN_RULES}
+    for i in range(8):  # rule prompts: one training rule explains every pair and query
+        xs = np.concatenate([px[i].numpy(), qx[i].numpy()])
+        ys = np.concatenate([py[i].numpy(), qy[i].numpy()])
+        assert any(np.array_equal((a * xs + b) % P, ys) for a, b in train)
+    for i in range(8, 16):  # fact prompts: a key always maps to the same value
+        seen = {}
+        for x, y in zip(np.concatenate([px[i].numpy(), qx[i].numpy()]), np.concatenate([py[i].numpy(), qy[i].numpy()])):
+            assert seen.setdefault(int(x), int(y)) == int(y)
+    p2 = gt.mixed(4, 5, 5, prefix=True)
+    assert torch.equal(p2[0], p2[3]) and pv.all()

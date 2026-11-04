@@ -81,7 +81,7 @@ def main():
     dev = "cuda" if torch.cuda.is_available() else "cpu"
     have = all((CKPT_DIR / f"{arm}.pt").exists() for arm in TRAINED)
     if not a.quick and not have:
-        sys.exit("No checkpoints in ckpt/. Train on the GPU (python train_all.py) or download "
+        sys.exit("No checkpoints in ckpt/. Train on the GPU (python train.py) or download "
                  "them from the GitHub release (see README).")
     n = a.n or (8 if a.quick else 500)
     k_list = [0, 2, 4, 8, 16, 64] if a.quick else K_LIST
