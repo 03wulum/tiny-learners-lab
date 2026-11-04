@@ -1,0 +1,7 @@
+# PyTorch (tested with torch==2.15.0) is installed separately: CUDA build on the GPU machine,
+# CPU build in CI (pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu).
+numpy==2.5.4
+scipy==1.18.1
+matplotlib==3.11.2
+psutil==7.2.2
+pytest==9.2.0
