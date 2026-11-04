@@ -374,6 +374,7 @@ def main():
     if not a.smoke and not torch.cuda.is_available():
         sys.exit("No CUDA GPU found. Training runs on Fortran's GPU only (lab rule).")
     dev = "cpu" if a.smoke else "cuda"
+    torch.set_num_threads(2)                                   # Fortran rule: light on the shared CPU
     if not a.smoke:
         torch.backends.cuda.matmul.allow_tf32 = True
     ck = os.path.join(HERE, "results", "quick", "ckpt") if a.smoke else os.path.join(HERE, "ckpt")
