@@ -1,0 +1,362 @@
+{
+ "verdict": "INCONCLUSIVE",
+ "rows": [
+  {
+   "criterion": "C1 budget",
+   "value": {
+    "composer_mb": 0.0,
+    "kept_mb": 0.010792,
+    "train_min": 0.0,
+    "answer_ms": 0.00030199999999999997,
+    "search_s": 0.0008869400001003669,
+    "peak_ram_gb": 1.590833152
+   },
+   "threshold": {
+    "composer_mb": 1.0,
+    "kept_mb": 50.0,
+    "train_min": 10.0,
+    "answer_ms": 1.0,
+    "search_s": 1.0,
+    "peak_ram_gb": 2.0
+   },
+   "result": "PASS"
+  },
+  {
+   "criterion": "C2 arithmetic, 5 unseen ops (composer mean, margin over best baseline)",
+   "value": {
+    "composer": 100.0,
+    "best_baseline": 0.0,
+    "margin": 100.0
+   },
+   "threshold": ">= 90.0 and margin >= 30.0",
+   "result": "PASS"
+  },
+  {
+   "criterion": "C3 going the opposite way: a - b",
+   "value": {
+    "composer": 100.0,
+    "training_facts": 100
+   },
+   "threshold": ">= 95.0, facts <= 100, 0 subtractions",
+   "result": "PASS"
+  },
+  {
+   "criterion": "C4 family, 6 unseen relations (composer mean, margin over best baseline)",
+   "value": {
+    "composer": 95.51282051282051,
+    "best_baseline": 0.0,
+    "margin": 95.51282051282051
+   },
+   "threshold": ">= 90.0 and margin >= 30.0",
+   "result": "PASS"
+  }
+ ],
+ "gate": {
+  "G1 arith baseline own tasks": false,
+  "G2 arith oracle": false,
+  "G3 arith shuffled": true,
+  "G3 arith untrained": true,
+  "G3 arith no_undo": true,
+  "G3 arith random_op": true,
+  "G1 family baseline own tasks": false,
+  "G2 family oracle": false,
+  "G3 family shuffled": true,
+  "G3 family untrained": true,
+  "G3 family no_undo": true,
+  "G3 family random_relation": true
+ },
+ "intriguing": [
+  "from a single example the composer got >= 90% on 8 unseen operations (add3, minus3, sub, half, mul, grandchild, grandmother, cousin)"
+ ],
+ "metrics": {
+  "budget": {
+   "composer_mb": 0.0,
+   "kept_mb": 0.010792,
+   "train_min": 0.0,
+   "answer_ms": 0.00030199999999999997,
+   "search_s": 0.0008869400001003669,
+   "peak_ram_gb": 1.590833152
+  },
+  "arith": {
+   "fp": {
+    "add3": 100.0,
+    "minus3": 100.0,
+    "sub": 100.0,
+    "half": 100.0,
+    "mul": 100.0
+   },
+   "fp_k": {
+    "add3": {
+     "1": 90.0,
+     "2": 100.0,
+     "4": 100.0,
+     "8": 100.0
+    },
+    "minus3": {
+     "1": 100.0,
+     "2": 100.0,
+     "4": 100.0,
+     "8": 100.0
+    },
+    "sub": {
+     "1": 95.0,
+     "2": 100.0,
+     "4": 100.0,
+     "8": 100.0
+    },
+    "half": {
+     "1": 95.0,
+     "2": 100.0,
+     "4": 100.0,
+     "8": 100.0
+    },
+    "mul": {
+     "1": 100.0,
+     "2": 100.0,
+     "4": 100.0,
+     "8": 100.0
+    }
+   },
+   "base": {
+    "small": {
+     "add3": 0.0,
+     "minus3": 0.0,
+     "sub": 0.0,
+     "half": 0.0,
+     "mul": 0.0
+    },
+    "large": {
+     "add3": 0.0,
+     "minus3": 0.0,
+     "sub": 0.0,
+     "half": 0.0,
+     "mul": 0.0
+    }
+   },
+   "oracle": {
+    "add3": 0.0,
+    "minus3": 0.0,
+    "sub": 0.0,
+    "half": 5.0,
+    "mul": 0.0
+   },
+   "controls": {
+    "shuffled": 0.0,
+    "untrained": 0.0,
+    "no_undo": 0.0,
+    "random_op": 0.0
+   },
+   "missing": {
+    "add3": 15.0,
+    "minus3": 15.0,
+    "sub": 0.0,
+    "half": 0.0,
+    "mul": 0.0
+   },
+   "base_own": {
+    "small": 1.4285714285714286,
+    "large": 1.4285714285714286
+   },
+   "programs": [
+    {
+     "add3": "bind(iter(S),#3)",
+     "minus3": "inv(bind(iter(S),#3))",
+     "sub": "iter(inv(S))",
+     "half": "inv(diag(iter(S)))",
+     "mul": "acc(iter(S))"
+    }
+   ],
+   "library_size": [
+    415
+   ],
+   "library_build_s": 0.1844753169998512,
+   "search_s": 0.00010724100002335035,
+   "block_fit": 100.0,
+   "fp_mean": 100.0,
+   "base_means": {
+    "small": 0.0,
+    "large": 0.0
+   },
+   "base_best_size": "small",
+   "base_best_mean": 0.0,
+   "base_best": {
+    "add3": 0.0,
+    "minus3": 0.0,
+    "sub": 0.0,
+    "half": 0.0,
+    "mul": 0.0
+   },
+   "oracle_mean": 1.0,
+   "base_own_best": 1.4285714285714286,
+   "fp_k1": {
+    "add3": 90.0,
+    "minus3": 100.0,
+    "sub": 95.0,
+    "half": 95.0,
+    "mul": 100.0
+   },
+   "fp_seed_means": [
+    100.0
+   ],
+   "facts": 100,
+   "latent_chain": {},
+   "random_op_baseline": {
+    "small": 10.0,
+    "large": 0.0
+   }
+  },
+  "family": {
+   "fp": {
+    "grandchild": 100.0,
+    "grandmother": 100.0,
+    "uncle": 100.0,
+    "aunt": 73.07692307692308,
+    "nephew": 100.0,
+    "cousin": 100.0
+   },
+   "fp_k": {
+    "grandchild": {
+     "1": 100.0,
+     "2": 100.0,
+     "4": 100.0,
+     "8": 100.0
+    },
+    "grandmother": {
+     "1": 100.0,
+     "2": 100.0,
+     "4": 100.0,
+     "8": 100.0
+    },
+    "uncle": {
+     "1": 52.77777777777778,
+     "2": 100.0,
+     "4": 100.0,
+     "8": 100.0
+    },
+    "aunt": {
+     "1": 50.0,
+     "2": 74.39024390243902,
+     "4": 73.07692307692308,
+     "8": 100.0
+    },
+    "nephew": {
+     "1": 29.166666666666668,
+     "2": 100.0,
+     "4": 100.0,
+     "8": 100.0
+    },
+    "cousin": {
+     "1": 100.0,
+     "2": 100.0,
+     "4": 100.0,
+     "8": 100.0
+    }
+   },
+   "base": {
+    "small": {
+     "grandchild": 0.0,
+     "grandmother": 0.0,
+     "uncle": 0.0,
+     "aunt": 0.0,
+     "nephew": 0.0,
+     "cousin": 0.0
+    },
+    "large": {
+     "grandchild": 0.0,
+     "grandmother": 0.0,
+     "uncle": 0.0,
+     "aunt": 0.0,
+     "nephew": 0.0,
+     "cousin": 0.0
+    }
+   },
+   "oracle": {
+    "grandchild": 0.0,
+    "grandmother": 0.0,
+    "uncle": 0.0,
+    "aunt": 0.0,
+    "nephew": 0.0,
+    "cousin": 0.0
+   },
+   "controls": {
+    "shuffled": 0.0,
+    "untrained": 0.0,
+    "no_undo": 0.0,
+    "random_relation": 0.0
+   },
+   "missing": {
+    "grandchild": 23.214285714285715,
+    "grandmother": 86.3013698630137,
+    "uncle": 46.07843137254902,
+    "aunt": 0.0,
+    "nephew": 40.476190476190474,
+    "cousin": 0.0
+   },
+   "base_own": {
+    "small": 0.0,
+    "large": 0.0
+   },
+   "programs": [
+    {
+     "grandchild": "inv((P ; P))",
+     "grandmother": "female((P ; P))",
+     "uncle": "male((P ; nonself((P ; inv(P)))))",
+     "aunt": "female((P ; nonself((P ; inv(P)))))",
+     "nephew": "male(inv((P ; nonself((P ; inv(P))))))",
+     "cousin": "(P ; inv((P ; nonself((P ; inv(P))))))"
+    }
+   ],
+   "library_size": [
+    861
+   ],
+   "library_build_s": 0.4249985659998856,
+   "search_s": 0.0008869400001003669,
+   "block_fit": 100.0,
+   "fp_mean": 95.51282051282051,
+   "base_means": {
+    "small": 0.0,
+    "large": 0.0
+   },
+   "base_best_size": "small",
+   "base_best_mean": 0.0,
+   "base_best": {
+    "grandchild": 0.0,
+    "grandmother": 0.0,
+    "uncle": 0.0,
+    "aunt": 0.0,
+    "nephew": 0.0,
+    "cousin": 0.0
+   },
+   "oracle_mean": 0.0,
+   "base_own_best": 0.0,
+   "fp_k1": {
+    "grandchild": 100.0,
+    "grandmother": 100.0,
+    "uncle": 52.77777777777778,
+    "aunt": 50.0,
+    "nephew": 29.166666666666668,
+    "cousin": 100.0
+   },
+   "fp_seed_means": [
+    95.51282051282051
+   ],
+   "soft": {
+    "grandchild": 100.0,
+    "grandmother": 100.0,
+    "uncle": 100.0,
+    "aunt": 73.07692307692308,
+    "nephew": 100.0,
+    "cousin": 100.0
+   },
+   "random_relation_baseline": {
+    "small": 0.0,
+    "large": 0.0
+   }
+  },
+  "train": {
+   "total_train_min": 0.0
+  },
+  "eval_min": 0.11408137480417888,
+  "quick": true
+ }
+}
