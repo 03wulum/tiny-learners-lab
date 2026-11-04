@@ -60,10 +60,12 @@ def test_zero_slot_is_identity():
 
 def test_stacked_runs_are_independent():
     """Training run 0 in a stack must give the same weights as training it alone."""
-    P2, P1 = _P(2), _P(1)
-    for k in P1:
-        P1[k] = P2[k][:1].clone()
-    c, x, y = torch.randn(2, 6, skills.CUE_DIM), torch.randint(17, (2, 6, 1)), torch.randint(17, (2, 6, 1))
+    # float64: batched and single einsums take different kernels, and Adam would amplify
+    # float32 rounding differences in near-zero gradients
+    P2 = {k: v.double() for k, v in _P(2).items()}
+    P1 = {k: v[:1].clone() for k, v in P2.items()}
+    c = torch.randn(2, 6, skills.CUE_DIM, dtype=torch.float64)
+    x, y = torch.randint(17, (2, 6, 1)), torch.randint(17, (2, 6, 1))
     for P, R in ((P2, 2), (P1, 1)):
         ps = list(P.values())
         for p in ps:
