@@ -1,0 +1,63 @@
+{
+ "wall_minutes": 11.54,
+ "train_minutes": 11.54,
+ "paused_minutes": 0.0,
+ "stopped_for_ram": false,
+ "device": "cuda",
+ "gpu": "NVIDIA GeForce RTX 4080 SUPER",
+ "peak_gpu_gb": 5.28,
+ "torch": "2.15.0+cu132",
+ "python": "3.13.5",
+ "arms": {
+  "A": {
+   "arm": "A",
+   "recipe": "icl",
+   "params": 999699,
+   "steps": 4508,
+   "batch": 1024,
+   "train_seconds": 75.0,
+   "device": "cuda",
+   "seed": 0
+  },
+  "C": {
+   "arm": "C",
+   "recipe": "meta",
+   "params": 999699,
+   "steps": 1375,
+   "batch": 512,
+   "train_seconds": 105.0,
+   "device": "cuda",
+   "seed": 0
+  },
+  "D": {
+   "arm": "D",
+   "recipe": "icl",
+   "params": 1004859,
+   "steps": 485,
+   "batch": 1024,
+   "train_seconds": 75.1,
+   "device": "cuda",
+   "seed": 0
+  },
+  "A-0.1M": {
+   "arm": "A-0.1M",
+   "recipe": "icl",
+   "params": 104915,
+   "steps": 1956,
+   "batch": 1024,
+   "train_seconds": 15.0,
+   "device": "cuda",
+   "seed": 0
+  },
+  "A-5M": {
+   "arm": "A-5M",
+   "recipe": "icl",
+   "params": 4754195,
+   "steps": 427,
+   "batch": 1024,
+   "train_seconds": 421.6,
+   "device": "cuda",
+   "seed": 0
+  }
+ }
+}

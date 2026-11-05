@@ -1,0 +1,26 @@
+{
+ "arm": "D",
+ "recipe": "icl",
+ "params": 1004859,
+ "steps": 485,
+ "batch": 1024,
+ "train_seconds": 75.1,
+ "device": "cuda",
+ "seed": 0,
+ "log": [
+  {
+   "step": 200,
+   "t": 28.1,
+   "loss": 1.9841,
+   "heldout_acc_k8": 0.3872,
+   "ram_pct": 87.3
+  },
+  {
+   "step": 400,
+   "t": 60.5,
+   "loss": 1.8573,
+   "heldout_acc_k8": 0.3809,
+   "ram_pct": 80.0
+  }
+ ]
+}
