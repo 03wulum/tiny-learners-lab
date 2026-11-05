@@ -135,7 +135,7 @@ def write_report(m, tab, info, out):
            f"- Recovery events: {m['recovery_events']}",
            f"- Pretrained recall: core {m['pretrain_core']:.1f}, plain {m['pretrain_plain']:.1f}, core code path {m['pretrain_code_path']:.1f}",
            f"- Tuned on the validation stream: {info['hp']}"]
-    with open(os.path.join(out, "results.md"), "w") as f:
+    with open(os.path.join(out, "results.md"), "w", encoding="utf-8") as f:
         f.write("\n".join(md) + "\n")
     print("\n".join(lines))
     return v
