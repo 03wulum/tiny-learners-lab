@@ -146,7 +146,7 @@ def main():
             "model_mb_fp32": sizes,
             "artifacts_mb": sum(f.stat().st_size for f in files if f.exists()) / 1e6,
             "train_minutes_arm_max": max(arm_minutes),
-            "train_minutes_total": tsum.get("wall_minutes", max(arm_minutes)),
+            "train_minutes_total": tsum.get("train_minutes", tsum.get("wall_minutes", max(arm_minutes))),
             "adapt_seconds": float(np.median(times)),
             "adapt_device": dev,
         },

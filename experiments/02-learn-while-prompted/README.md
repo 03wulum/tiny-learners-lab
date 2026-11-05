@@ -67,7 +67,7 @@ Checkpoints are saved in fp16 (about 16 MB for all five) to `ckpt/`, which git i
 | `models.py` | the transformer and fast-weight memory models, with the per-prompt adapter |
 | `ttt.py` | leave-one-out test-time training |
 | `arms.py` | arm definitions, checkpoint save/load |
-| `train.py`, `gpu_tasks.py` | GPU training (one process, prompts generated on the GPU, stops early if system RAM passes 85%) |
+| `train.py`, `gpu_tasks.py` | GPU training (one process, prompts generated on the GPU, pauses while system RAM is above 92%) |
 | `run.py`, `criteria.py`, `plots.py` | evaluation, pre-registered criteria, plots |
 | `demo.py` | interactive demo |
 | `test_learn.py` | 19 code tests: masks, leaks, gradients, budgets, verdict logic |

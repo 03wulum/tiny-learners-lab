@@ -2,8 +2,8 @@
 
 Arms take turns step by step, each getting a fixed share of the wall-clock budget, so the
 whole run finishes in --minutes (default 5; Obi's rule: about 5, never more than 10). Prompts are generated on the GPU; nothing
-large lives in system RAM. If system RAM use passes --ram-limit percent, training stops
-early and saves what it has.
+large lives in system RAM. If system RAM passes --ram-limit percent (default 92), training pauses
+until it drops; after --max-pause minutes it stops early and saves.
 
 Training never runs on CPU (Obi's rule). The only CPU path is --smoke: 3 steps of toy-size
 models to check the code; it saves nothing unless --out is given.
@@ -90,7 +90,10 @@ def main():
     ap.add_argument("--minutes", type=float, default=5.0, help="total wall-clock budget, all arms (max 10)")
     ap.add_argument("--batch-scale", type=float, default=None,
                     help="multiply every arm's batch size (default: from free GPU memory)")
-    ap.add_argument("--ram-limit", type=float, default=85.0, help="stop early above this system RAM %%")
+    ap.add_argument("--ram-limit", type=float, default=92.0,
+                    help="pause training while system RAM is above this %%")
+    ap.add_argument("--max-pause", type=float, default=3.0,
+                    help="stop early and save if RAM stays high this many minutes")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--out", type=Path, default=None)
     ap.add_argument("--smoke", action="store_true", help="3 steps per arm, toy size, CPU allowed")
@@ -124,6 +127,7 @@ def main():
 
     t0 = time.time()
     stopped_for_ram = False
+    paused_s = 0.0
     while True:
         live = [s for s in states if (s.steps < 3 if a.smoke else s.used < s.budget)]
         if not live:
@@ -151,14 +155,24 @@ def main():
                      "ram_pct": ram_percent()}
             s.log.append(entry)
             print(s.arm, json.dumps(entry), flush=True)
-            if entry["ram_pct"] > a.ram_limit:
-                print(f"system RAM at {entry['ram_pct']:.0f}% > {a.ram_limit}%: stopping early and saving")
+        if not a.smoke and (s.steps % 25 == 0) and ram_percent() > a.ram_limit:
+            # pause (not stop): wait for other jobs to free RAM; paused time doesn't count
+            print(f"system RAM above {a.ram_limit}%: pausing training", flush=True)
+            waited = 0.0
+            while ram_percent() > a.ram_limit and waited < a.max_pause * 60:
+                time.sleep(5)
+                waited += 5
+            paused_s += waited
+            if ram_percent() > a.ram_limit:
+                print(f"RAM still above {a.ram_limit}% after {a.max_pause} min: stopping early and saving")
                 stopped_for_ram = True
                 break
+            print(f"resumed after {waited:.0f}s", flush=True)
 
     wall = time.time() - t0
     out = a.out if a.out else (None if a.smoke else CKPT_DIR)
-    summary = {"wall_minutes": round(wall / 60, 2), "stopped_for_ram": stopped_for_ram, "device": dev,
+    summary = {"wall_minutes": round(wall / 60, 2), "train_minutes": round((wall - paused_s) / 60, 2),
+               "paused_minutes": round(paused_s / 60, 2), "stopped_for_ram": stopped_for_ram, "device": dev,
                "gpu": torch.cuda.get_device_name(0) if dev == "cuda" else "none",
                "peak_gpu_gb": round(torch.cuda.max_memory_allocated() / 1e9, 2) if dev == "cuda" else 0,
                "torch": torch.__version__, "python": platform.python_version(), "arms": {}}
