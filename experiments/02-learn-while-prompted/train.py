@@ -146,7 +146,11 @@ def main():
         s.opt.step()
         if dev == "cuda":
             torch.cuda.synchronize()
-        s.used += time.time() - ts
+        dt = time.time() - ts
+        if dt > 30 and s.steps > 10:  # the process was suspended from outside (e.g. by pcguard)
+            paused_s += dt
+            dt = s.used / s.steps  # count the step at its typical length
+        s.used += dt
         s.steps += 1
         if s.steps % 200 == 0 or a.smoke:
             s.model.eval()

@@ -8,8 +8,14 @@ import matplotlib.pyplot as plt  # noqa: E402
 
 STYLE = {"A": ("#7f7f7f", "-"), "B": ("#d62728", "--"), "C": ("#1f77b4", "-"), "C-frozen": ("#1f77b4", ":"),
          "D": ("#2ca02c", "-"), "A-0.1M": ("#dddddd", "-"), "A-5M": ("#bbbbbb", "-")}
-PANELS = [("rules_heldout", "T1 new rules (held out)"), ("facts_shown", "T2 new facts (shown keys)"),
-          ("quad", "T4 new rule family"), ("shuffled", "Shuffled labels (must stay at chance)")]
+PANELS = [("rules_train", "Rules seen in training"), ("rules_heldout", "T1 new rules (held out)"),
+          ("quad", "T4 new rule family"), ("facts_shown", "T2 new facts (shown keys)")]
+P_OUT = 17
+
+
+def copy_only(k):
+    """Accuracy of a learner that only repeats answers it was shown: P(query x was in the prompt)."""
+    return 1 - (1 - 1 / P_OUT) ** k
 
 
 def make_all(m: dict, out_dir):
@@ -18,6 +24,8 @@ def make_all(m: dict, out_dir):
     for ax, (task, title) in zip(axes, PANELS):
         ax.plot(ks, [m["ideal"][task][str(k)] for k in ks], color="black", lw=1, label="ideal learner")
         ax.axhline(1 / 17, color="black", ls=":", lw=0.8)
+        if task != "facts_shown":
+            ax.plot(ks, [copy_only(k) for k in ks], color="#ff7f0e", ls="--", lw=1.5, label="copy-only (no rule)")
         for arm, (col, ls) in STYLE.items():
             if arm in m["acc"] and task in m["acc"][arm]:
                 ax.plot(ks, [m["acc"][arm][task][str(k)] for k in ks], color=col, ls=ls, marker="o", ms=3, label=arm)

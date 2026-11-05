@@ -156,10 +156,11 @@ def main():
     v = criteria.verdict(passed, gate)
     runtime = time.time() - t0
     try:
-        import resource  # Linux/macOS only
+        import resource  # Linux/macOS
         peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1e6  # KB -> GB
-    except ImportError:  # Windows
-        peak = 0.0
+    except ImportError:  # Windows: psutil reports the peak working set
+        import psutil
+        peak = getattr(psutil.Process().memory_info(), "peak_wset", 0) / 1e9
 
     print("\n" + "-" * 120)
     print(f"{'id':<4}{'criterion':<52}{'value':<58}PASS?")

@@ -28,6 +28,14 @@ In an early 4-minute test, plain cramming (B) made the model **worse**. The big 
 
 Training only ever showed the model up to 16 examples. At test time we give it up to **64**. If it keeps getting better past 16, it's genuinely learning from new data, not just repeating a pattern it practiced. That's criterion C4, and it decides PASS or FAIL.
 
+## What actually happened (verdict: FAIL)
+
+- **Facts: yes.** Every model, even a 0.4 MB one, remembered new facts perfectly after seeing them once, and correctly "didn't know" facts it wasn't told. That kept working with 4× more facts than it ever practised on.
+- **Rules: no.** Instead of working out the secret rule, the models only repeated answers they had already been shown. Think of a student who memorises the answers in the worked examples but can't solve a new problem. On the rules it saw during training, the best model was excellent (97% after 8 examples), because it had memorised all 204 of them. Given a brand new rule, it could only copy.
+- **Cramming didn't help.** Retraining on the prompt's examples, plain or practised, changed almost nothing.
+
+The likely fix is more variety: thousands of different training rules instead of 204, so memorising them all stops being easier than learning the method. Research on in-context learning predicts exactly this switch.
+
 ## Why it matters
 
 - **Personal AI on your phone**: an app that learns your shortcuts, names or habits on the device, with nothing sent to the cloud.
@@ -46,4 +54,5 @@ Training only ever showed the model up to 16 examples. At test time we give it u
 - [Learning to (learn at test time)](https://arxiv.org/abs/2407.04620) (Sun et al., 2024): layers whose memory is a tiny model trained as it reads.
 - [Titans: learning to memorize at test time](https://arxiv.org/abs/2501.00663) (Behrouz et al., 2025): a memory that decides what's surprising enough to store.
 - [The surprising effectiveness of test-time training for abstract reasoning](https://arxiv.org/abs/2411.07279) (Akyürek et al., 2024): cramming on puzzle examples works when done carefully.
+- [Pretraining task diversity and the emergence of non-Bayesian in-context learning](https://arxiv.org/abs/2306.15063) (Raventós et al., 2023): why too few training tasks leads to memorising instead of learning the method.
 - [MAML](https://arxiv.org/abs/1703.03400) (Finn et al., 2017): the classic "learning to learn" method that arm C uses.
