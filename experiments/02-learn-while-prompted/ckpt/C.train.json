@@ -1,0 +1,54 @@
+{
+ "arm": "C",
+ "recipe": "meta",
+ "params": 999699,
+ "steps": 1375,
+ "batch": 512,
+ "train_seconds": 105.0,
+ "device": "cuda",
+ "seed": 0,
+ "log": [
+  {
+   "step": 200,
+   "t": 12.7,
+   "loss": 2.7559,
+   "heldout_acc_k8": 0.4194,
+   "ram_pct": 79.1
+  },
+  {
+   "step": 400,
+   "t": 26.2,
+   "loss": 3.0539,
+   "heldout_acc_k8": 0.4033,
+   "ram_pct": 87.0
+  },
+  {
+   "step": 600,
+   "t": 41.8,
+   "loss": 2.5937,
+   "heldout_acc_k8": 0.3916,
+   "ram_pct": 87.1
+  },
+  {
+   "step": 800,
+   "t": 57.4,
+   "loss": 2.5447,
+   "heldout_acc_k8": 0.3877,
+   "ram_pct": 80.5
+  },
+  {
+   "step": 1000,
+   "t": 74.4,
+   "loss": 2.4958,
+   "heldout_acc_k8": 0.3838,
+   "ram_pct": 80.2
+  },
+  {
+   "step": 1200,
+   "t": 90.5,
+   "loss": 3.2485,
+   "heldout_acc_k8": 0.3818,
+   "ram_pct": 80.0
+  }
+ ]
+}

@@ -1,0 +1,48 @@
+{
+ "experiment": "02-learn-while-prompted",
+ "verdict": "FAIL",
+ "quick": false,
+ "untrained_toy": false,
+ "criteria": [
+  {
+   "id": "C1",
+   "name": "Fits the budget",
+   "value": "19.0 MB/model, 15.8 MB total, 7.0/11.5 min, 0.01 s/prompt",
+   "threshold": "20 MB, 50 MB, 10/10 min, 1 s",
+   "pass": false
+  },
+  {
+   "id": "C2",
+   "name": "Learns new rules (T1)",
+   "value": "A-0.1M: 38.7%, rho 1.00",
+   "threshold": ">= 80%, rho >= 0.9",
+   "pass": false
+  },
+  {
+   "id": "C3",
+   "name": "Learns new facts (T2)",
+   "value": "A: 100.0% recall, unseen 6.2%",
+   "threshold": ">= 90%, unseen 5.9% +/- 3",
+   "pass": true
+  },
+  {
+   "id": "C4",
+   "name": "Keeps improving past its training (T3, headline)",
+   "value": "C: 99% of ideal, +1.3% vs A",
+   "threshold": ">= 80% of ideal, >= +15 pts",
+   "pass": false
+  },
+  {
+   "id": "C5",
+   "name": "Updating must be learned",
+   "value": "C 22.6% vs B 22.5% (+0.2%)",
+   "threshold": ">= +10 pts",
+   "pass": false
+  }
+ ],
+ "validity_gate": true,
+ "base_model_learned": true,
+ "runtime_s": 45.083796977996826,
+ "peak_ram_gb": 0.0,
+ "hypothesis": "A model of 20 MB or less can learn new rules and facts from its prompt, and with a learned update rule (meta-learned test-time training or a fast-weight memory) it keeps improving when the prompt holds more examples than it ever trained on."
+}
