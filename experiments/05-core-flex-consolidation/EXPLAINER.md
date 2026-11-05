@@ -1,6 +1,6 @@
 # Explainer: core + flexible weights (tiny-learners 05)
 
-_Readable in about 5 minutes. Results are filled in after the GPU run._
+_Readable in about 5 minutes. Verdict: **FAIL**, 4 of 5 criteria. It missed the headline by 0.6 points, and the most useful finding was one we didn't plan for._
 
 ## 1. What we tested and why
 
@@ -20,7 +20,7 @@ In the model:
 ## 3. The process, step by step (and the choices you might disagree with)
 
 1. **Skills.** A skill is a cue bound to a rule `y = (a·x + b) mod 17`. The cue is a random point on a 64-dimensional sphere, and each time it arrives slightly blurred, the way a request is never phrased the same way twice. *Choice:* the skills are synthetic, so we know the right answer and can measure exactly what was kept.
-2. **Pretraining (GPU, about 75 s).** The core learns 208 rules. It also learns, through practice codes, what a slot code means. The baselines' plain network learns the same 208 rules and is made wider, so it has exactly as many parameters as the core plus all 18 slots (249K).
+2. **Pretraining (GPU, 60 s).** The core learns 208 rules. It also learns, through practice codes, what a slot code means. The baselines' plain network learns the same 208 rules and is made wider, so it has exactly as many parameters as the core plus all 18 slots (249K).
 3. **The stream.** 224 episodes per seed, each showing 6 worked examples. 8 frequent skills come back 12 times, 24 occasional ones 4 times, and 32 one-offs arrive in 4 bursts of 8, which try to flush the important skills out. Every learner gets the same 20 gradient steps per episode.
 4. **Opponents.** A frozen network. Plain fine-tuning, which is known to forget. EWC, which pulls important weights back toward their old values. Replay, which re-studies stored old examples, using as many bytes as our archive could ever reach. *Choice:* we gave replay the most generous fair budget, so beating it is meaningful.
 5. **Ablations:** remove the archive, use one ring instead of two (with least-recently-used or strength eviction), harden every skill at once, unlimited slots, and half or double the slots.
@@ -28,7 +28,26 @@ In the model:
 
 ## 4. What we found
 
-_Pending the GPU run._
+The whole run took 1.9 minutes on Fortran's RTX 4080 SUPER, in one process, peaking at 1.6 GB of RAM.
+
+| | Remembered at the end | Pretrained skills | New skills |
+|---|---|---|---|
+| Frozen | 52.5 | 100 | 4.9 (chance) |
+| Fine-tune | 50.1 | 73.9 | 26.3 |
+| EWC | 27.6 | 26.9 | 28.3 |
+| Replay (same bytes) | 65.2 | 87.8 | 42.7 |
+| **Core + flex (yours)** | **79.5** | **100** | **59.1** |
+
+- **It remembered the most:** 79.5 vs 50.1 for fine-tuning and 65.2 for replay. The pre-registered bar was +30 over fine-tuning. It reached +29.4, which is a real miss: the 3 seeds agree within 0.15 points. So the verdict is FAIL. Against replay, the strongest baseline, it won by 14 points with less storage (340 KB of archive vs 400 KB of replay).
+- **It learned as fast as fine-tuning** (35.4 vs 37.3 after a skill's first 6 examples), and it never damaged the core: pretrained skills stayed at 100%.
+- **Archived skills came back perfectly:** 194 returns at 100% of their last recall, with no new examples. Without the archive, recall on return was 16%.
+- **The surprise: the archive is what remembers.** Count only the weights that are loaded, and the model holds 23% of the new skills, less than replay's 43%. Take the archive away and the score falls from 79.5 to 61.6. A plain one-ring cache with an archive scored the same as your two-ring design (79.8), and so did 9, 36 or unlimited slots.
+- **Hardening works, but the two rings aren't needed.** After each burst of one-offs, your model still had 77% of its frequent skills loaded, against 47% for a cache that drops the least recently used skill. A single ring that drops the *weakest* skill (strength = how often it's used, fading over time) kept 80%. The strength score does the protecting, not the second ring.
+- **It memorised, it didn't find the rule.** On inputs a skill hadn't shown yet, every learner was at or below chance. So a skill seen once caps at 6 of 17 answers (35%), and only repetition fills in the rest. The core's code space did not let a slot jump to a new rule from 6 examples.
+
+Caveats: EWC's tuning grid started at a learning rate of 1e-3 while fine-tuning's went down to 3e-4, so EWC is probably under-tuned. Skills are synthetic. Lookup was 3.3 µs per query on Fortran's CPU, and one model's update took 43 ms per episode on the GPU.
+
+**Next steps this suggests:** (1) let hardened slots slowly teach the core ("consolidation" proper), so the active weights hold more and the archive less; (2) give slots structure (e.g. separate codes for a and b) so one example batch can find the rule, not just the pairs; (3) try it on a real on-device task, such as app intents a phone learns from you.
 
 ## 5. Why it matters
 

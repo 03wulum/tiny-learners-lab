@@ -61,7 +61,8 @@ def make(per_seed, tab, out):
             continue
         ax.plot(np.arange(1, rec.shape[1] + 1), rec.mean(0), "-o", color=col, lw=2, ms=8, label=ARM_LABEL[a])
     ax.set_ylim(0, 105)
-    ax.set_xlabel("burst of one-off skills")
+    ax.set_xticks(range(1, 5))
+    ax.set_xlabel("burst of one-off skills (8 each)")
     ax.set_ylabel("frequent-skill recall (%)")
     ax.set_title("Do bursts of novelty push out the important skills?", loc="left", fontsize=12)
     ax.legend(frameon=False, fontsize=10)

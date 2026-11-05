@@ -2,15 +2,21 @@
 
 **Goal:** can a fixed-size tiny model keep a stable core, pick up new skills in a small flexible ring, harden the ones that keep coming back, and archive (never lose) the ones it replaces, so it remembers better than fine-tuning or replay at the same size?
 
-**Verdict:** _pending GPU run_ · details: [EXPLAINER.md](EXPLAINER.md) · `results/results.md` after the run
+**Verdict: FAIL** (4 of 5) · ✨ INTRIGUING: the archive does the remembering. Any slot cache with an archive keeps as much as unlimited slots, and one ring that evicts by use-strength matches the two tiers · details: [EXPLAINER.md](EXPLAINER.md) · [results/results.md](results/results.md)
 
 | # | Criterion (pre-registered in [criteria.py](criteria.py)) | Threshold | Result |
 |---|---|---|---|
-| C1 | Budget | active model ≤ 20 MB, kept ≤ 20 MB, ≤ 10 GPU min (≈ 5 planned), update ≤ 50 ms, slot lookup ≤ 100 µs, RAM ≤ 2 GB | – |
-| C2 | Remembers old + new skills at the end (headline) | ≥ fine-tune + 30 pts **and** ≥ replay (same bytes) + 5 pts | – |
-| C3 | Learns a new skill fast (after its first 6 examples) | ≥ fine-tune − 5 pts | – |
-| C4 | Recovers archived skills with no new examples | ≥ 90% of last recall; the no-archive ablation ≤ 50% | – |
-| C5 | Hardening protects frequent skills through bursts of one-offs | ≥ one-ring LRU cache + 10 pts | – |
+| C1 | Budget | active ≤ 20 MB, kept ≤ 20 MB, ≤ 10 GPU min, update ≤ 50 ms, lookup ≤ 100 µs, RAM ≤ 2 GB | **PASS**: 0.5 MB active, 0.9 MB kept, 1.9 GPU min, 43 ms, 3.3 µs, 1.6 GB |
+| C2 | Remembers old + new skills at the end (headline) | ≥ fine-tune + 30 pts **and** ≥ replay (same bytes) + 5 pts | **FAIL**: 79.5 vs 50.1 (+29.4) and 65.2 (+14.3) |
+| C3 | Learns a new skill fast (after its first 6 examples) | ≥ fine-tune − 5 pts | **PASS**: 35.4 vs 37.3 (−1.9) |
+| C4 | Recovers archived skills with no new examples | ≥ 90% of last recall; no-archive ablation ≤ 50% | **PASS**: 100% (194 returns) vs 16% |
+| C5 | Hardening protects frequent skills through bursts of one-offs | ≥ one-ring LRU cache + 10 pts | **PASS**: 77.3 vs 47.4 (+30) |
+
+C2 missed by 0.6 points, which is 4 seed standard deviations (σ = 0.15), so the FAIL stands. All controls stayed at chance (shuffled cues 5.3%, never-seen 5.6%, frozen on new skills 5.1%); routing errors 0%.
+
+![retention](results/retention.png)
+
+**What the ablations say:** without the archive, stream recall falls from 59 to 23 points. A one-ring LRU cache with an archive retains just as much (79.8). Slot count barely matters with an archive (9, 18, 36 or unlimited: about 59). Hardening keeps frequent skills loaded through bursts (+30 over LRU), but a single ring that evicts by use-strength does it too (80.3 vs 77.3). No learner found the rule: on inputs not yet shown, every arm stayed at or below chance, so a one-off caps at 6/17 = 35%.
 
 Validity gate (else INCONCLUSIVE): both pretrained nets ≥ 90% on known skills; shuffled cues, never-seen skills, the frozen net on new skills and shuffled labels (on unseen inputs) all ≤ chance + 5 (chance 5.9%); wrong-slot routing ≤ 2%.
 
