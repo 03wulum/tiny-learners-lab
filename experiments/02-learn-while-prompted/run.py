@@ -83,7 +83,7 @@ def main():
     if not a.quick and not have:
         sys.exit("No checkpoints in ckpt/. Train on the GPU (python train.py) or download "
                  "them from the GitHub release (see README).")
-    n = a.n or (8 if a.quick else 500)
+    n = a.n or (8 if a.quick else 300)
     k_list = [0, 2, 4, 8, 16, 64] if a.quick else K_LIST
 
     models, train_meta = {}, {}
@@ -165,14 +165,16 @@ def main():
     print(f"{'id':<4}{'criterion':<52}{'value':<58}PASS?")
     for r in table:
         print(f"{r['id']:<4}{r['name']:<52}{r['value']:<58}{'PASS' if r['pass'] else 'FAIL'}")
-    print(f"validity gate (negative controls at chance): {'OK' if gate else 'FAILED'}")
+    print(f"base model learned (arm A >= 25% on training rules and shown facts at k=16): "
+          f"{'yes' if metrics['learned'] else 'NO: this run cannot test the idea'}")
+    print(f"validity gate (controls at chance, base model learned): {'OK' if gate else 'FAILED'}")
     label = " (quick: untrained toy models, not a result)" if a.quick and not have else ""
     print(f"VERDICT: {v}{label}   [{runtime:.0f}s, {peak:.2f} GB peak RAM, eval on {dev}]")
 
     out_dir = RES / "quick" if a.quick else RES
     out_dir.mkdir(parents=True, exist_ok=True)
     out = {"experiment": "02-learn-while-prompted", "verdict": v, "quick": a.quick, "untrained_toy": a.quick and not have,
-           "criteria": table, "validity_gate": gate, "runtime_s": runtime, "peak_ram_gb": peak,
+           "criteria": table, "validity_gate": gate, "base_model_learned": metrics["learned"], "runtime_s": runtime, "peak_ram_gb": peak,
            "hypothesis": criteria.HYPOTHESIS}
     (out_dir / "verdict.json").write_text(json.dumps(out, indent=1))
     if not a.quick:

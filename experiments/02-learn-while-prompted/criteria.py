@@ -17,7 +17,7 @@ HYPOTHESIS = (
 ASSUMPTIONS = [
     "Modular-arithmetic rules and random lookup tables are fair stand-ins for 'a new rule' and "
     "'new facts': generated per prompt, so nothing can be memorized from training.",
-    "5M parameters and a 5-minute GPU budget shared by all arms are enough capacity and time.",
+    "1M-parameter arms and a 5-minute GPU budget shared by all arms are enough capacity and time (the learnability gate below checks this).",
     "First-order-style meta-learning through 2 inner steps is stable at this size.",
 ]
 
@@ -50,7 +50,7 @@ CRITERIA = [
      "metric": "c5_ok", "op": "==", "threshold": 1},
 ]
 
-THRESH = {"c2_acc": 0.80, "c2_rho": 0.90, "c3_recall": 0.90, "c3_unseen_tol": 0.03,
+THRESH = {"learn_min": 0.25, "c2_acc": 0.80, "c2_rho": 0.90, "c3_recall": 0.90, "c3_unseen_tol": 0.03,
           "c4_of_ideal": 0.80, "c4_gain": 0.15, "c5_gain": 0.10, "gate_tol": 0.03}
 
 CONTROLS = {
@@ -59,6 +59,8 @@ CONTROLS = {
                 "chance (1/17 = 5.9%); unseen-key questions must stay at chance.",
     "baseline": "Arm A, the frozen in-context learner; arm B, the same weights plus naive SGD.",
     "ablation": "C-frozen: arm C's weights without its update; size sweep A at 0.1M / 1M / 5M.",
+    "learnability": "Arm A must reach >= 25% on training rules and on shown facts at k=16 (4x chance). "
+                    "If it doesn't, the base model never learned and the run can't test the idea: INCONCLUSIVE.",
 }
 
 
@@ -133,6 +135,11 @@ def score(m: dict) -> tuple[list[dict], dict[str, bool], bool]:
 
     gate = all(abs(acc[a]["shuffled"]["8"] - CHANCE) <= T["gate_tol"] for a in acc)
     gate &= abs(acc["untrained"]["rules_heldout"]["8"] - CHANCE) <= T["gate_tol"]
+    # learnability gate (added before any GPU run, after experiment 03's base model never
+    # learned on a busy GPU): a model that learned nothing can't test the hypothesis
+    learned = (acc["A"]["rules_train"]["16"] >= T["learn_min"] and acc["A"]["facts_shown"]["16"] >= T["learn_min"])
+    m["learned"] = bool(learned)
+    gate &= learned
     table = [{"id": cid, "name": c["name"], "value": val, "threshold": th, "pass": passed[cid]}
              for (cid, val, th), c in zip(rows, CRITERIA)]
     return table, passed, bool(gate)

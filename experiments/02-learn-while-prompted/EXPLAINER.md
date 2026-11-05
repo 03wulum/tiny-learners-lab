@@ -32,7 +32,7 @@ Training only ever showed the model up to 16 examples. At test time we give it u
 
 - **Personal AI on your phone**: an app that learns your shortcuts, names or habits on the device, with nothing sent to the cloud.
 - **Fast adaptation**: a robot or a game character that adjusts to a new situation from a handful of examples.
-- **Cheap**: training takes about 5 minutes on one gaming GPU, and the models fit in 31 MB together.
+- **Cheap**: training takes about 5 minutes on one gaming GPU, and the models fit in 16 MB together.
 
 ## Controls (how we know it isn't cheating)
 

@@ -31,8 +31,8 @@ from tasks import HELDOUT_RULES, P
 from ttt import adapt
 
 # share of the wall-clock budget per arm (meta-learning C is the most expensive per step)
-SHARE = {"A": 3.0, "C": 4.0, "D": 3.0, "A-1M": 1.0, "A-0.1M": 0.5}
-BATCH = {"A": 512, "C": 256, "D": 512, "A-1M": 512, "A-0.1M": 512}
+SHARE = {"A": 2.5, "C": 3.5, "D": 2.5, "A-0.1M": 0.5, "A-5M": 1.0}
+BATCH = {"A": 512, "C": 256, "D": 512, "A-0.1M": 512, "A-5M": 512}
 
 
 def ram_percent() -> float:

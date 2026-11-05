@@ -12,11 +12,12 @@ CKPT_DIR = HERE / "ckpt"   # git-ignored; published as a GitHub release asset
 
 # name -> (model kind, size, training recipe)
 TRAINED = {
-    "A": ("attn", "5M", "icl"),       # frozen in-context learner
-    "C": ("attn", "5M", "meta"),      # meta-learned test-time training
-    "D": ("mem", "5M", "icl"),        # fast-weight memory
-    "A-1M": ("attn", "1M", "icl"),    # size sweep
-    "A-0.1M": ("attn", "0.1M", "icl"),
+    # main arms at 1M params so they can learn inside a 5-minute GPU budget
+    "A": ("attn", "1M", "icl"),       # frozen in-context learner
+    "C": ("attn", "1M", "meta"),      # meta-learned test-time training
+    "D": ("mem", "1M", "icl"),        # fast-weight memory
+    "A-0.1M": ("attn", "0.1M", "icl"),  # size sweep
+    "A-5M": ("attn", "5M", "icl"),
 }
 
 # evaluation arms: name -> (checkpoint, test-time training mode)
@@ -28,8 +29,8 @@ EVAL_ARMS = {
     "C": ("C", "meta"),
     "C-frozen": ("C", None),   # ablation: C's weights without the update
     "D": ("D", None),
-    "A-1M": ("A-1M", None),
     "A-0.1M": ("A-0.1M", None),
+    "A-5M": ("A-5M", None),
 }
 
 TTT_STEPS = 2                 # inner steps for B and C, at training and test time

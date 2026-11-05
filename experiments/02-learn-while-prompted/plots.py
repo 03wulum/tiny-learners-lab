@@ -7,7 +7,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 STYLE = {"A": ("#7f7f7f", "-"), "B": ("#d62728", "--"), "C": ("#1f77b4", "-"), "C-frozen": ("#1f77b4", ":"),
-         "D": ("#2ca02c", "-"), "A-1M": ("#bbbbbb", "-"), "A-0.1M": ("#dddddd", "-")}
+         "D": ("#2ca02c", "-"), "A-0.1M": ("#dddddd", "-"), "A-5M": ("#bbbbbb", "-")}
 PANELS = [("rules_heldout", "T1 new rules (held out)"), ("facts_shown", "T2 new facts (shown keys)"),
           ("quad", "T4 new rule family"), ("shuffled", "Shuffled labels (must stay at chance)")]
 
