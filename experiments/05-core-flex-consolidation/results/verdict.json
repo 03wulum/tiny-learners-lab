@@ -1,0 +1,315 @@
+{
+ "experiment": "tiny-learners 05 core + flexible weights",
+ "verdict": "FAIL",
+ "intriguing": [
+  "the fixed-size model retained as much as one with unlimited slots",
+  "a one-tier cache that evicts by strength matched the two tiers"
+ ],
+ "criteria": [
+  {
+   "criterion": "C1 budget",
+   "value": {
+    "active_mb": 0.498466,
+    "kept_mb": 0.898523,
+    "total_gpu_min": 1.93,
+    "update_ms": 43.34259999450296,
+    "route_us": 3.2906950000000004,
+    "peak_ram_gb": 1.64
+   },
+   "threshold": {
+    "active_mb": 20.0,
+    "kept_mb": 20.0,
+    "total_gpu_min": 10.0,
+    "update_ms": 50.0,
+    "route_us": 100.0,
+    "peak_ram_gb": 2.0
+   },
+   "result": "PASS"
+  },
+  {
+   "criterion": "C2 retention (M - fine-tune, M - replay)",
+   "value": {
+    "vs_finetune": 29.39762443438915,
+    "vs_replay": 14.289922699849186
+   },
+   "threshold": ">= 30.0 and >= 5.0",
+   "result": "FAIL"
+  },
+  {
+   "criterion": "C3 learning speed (first episode, M - fine-tune)",
+   "value": -1.8710416666666632,
+   "threshold": ">= -5.0",
+   "result": "PASS"
+  },
+  {
+   "criterion": "C4 recovery from archive (M, no-archive)",
+   "value": {
+    "M": 1.0,
+    "no_archive": 0.1555653715213954
+   },
+   "threshold": "M >= 0.9, no-archive <= 0.5",
+   "result": "PASS"
+  },
+  {
+   "criterion": "C5 hardening (frequent skills after bursts, M - flat LRU)",
+   "value": 29.963235294117652,
+   "threshold": ">= 10.0",
+   "result": "PASS"
+  }
+ ],
+ "gate": {
+  "gate": {
+   "pretrain": true,
+   "shuffled_cues": true,
+   "never_seen": true,
+   "frozen_new": true,
+   "shuffled_labels": true,
+   "routing": true
+  },
+  "headline_noisy": false
+ },
+ "measured": {
+  "budget": {
+   "active_mb": 0.498466,
+   "kept_mb": 0.898523,
+   "total_gpu_min": 1.93,
+   "update_ms": 43.34259999450296,
+   "route_us": 3.2906950000000004,
+   "peak_ram_gb": 1.64
+  },
+  "ret_M": 79.52960030165913,
+  "ret_B": 50.13197586726998,
+  "ret_D": 65.23967760180994,
+  "ret_unlimited": 79.74406108597286,
+  "ret_seed_std": 0.1545039913563741,
+  "first_M": 35.443385416666665,
+  "first_B": 37.31442708333333,
+  "first_heldout_M": 0.23671875,
+  "recovery_M": 1.0,
+  "recovery_noarch": 0.1555653715213954,
+  "recovery_events": {
+   "M": 194,
+   "no_archive": 218
+  },
+  "burst_M": 77.31967787114846,
+  "burst_flatLRU": 47.356442577030805,
+  "burst_flatStrength": 80.30462184873949,
+  "pretrain_core": 99.97171783447266,
+  "pretrain_plain": 99.97171783447266,
+  "pretrain_code_path": 100.0,
+  "ctrl_shuffled_cue": 5.269607843137255,
+  "ctrl_never_seen": 5.637254901960785,
+  "ctrl_frozen_new": 5.0534375,
+  "ctrl_shuffled_labels_heldout": 0.5207812500000001,
+  "route_error_rate": 0.0,
+  "archive_kb": 340.2666666666667,
+  "replay_kb": 399.88
+ },
+ "arms": {
+  "A": {
+   "retention": 52.466299019607845,
+   "pretrained": 100.0,
+   "stream": 4.932598039215686,
+   "stream_active": 4.932598039215686,
+   "stream_freq": 4.901960784313725,
+   "stream_occ": 4.738562091503268,
+   "stream_one": 5.0857843137254894,
+   "first": 5.0534375,
+   "first_held": 4.87640625,
+   "return_ratio": 0.7804329677410274,
+   "burst": 6.153711484593837,
+   "shuffled_cue": 5.698529411764706,
+   "never_seen": 5.637254901960784
+  },
+  "B": {
+   "retention": 50.13197586726998,
+   "pretrained": 73.91591251885372,
+   "stream": 26.34803921568627,
+   "stream_active": 26.34803921568627,
+   "stream_freq": 67.40196078431373,
+   "stream_occ": 32.43464052287582,
+   "stream_one": 11.519607843137253,
+   "first": 37.31442708333333,
+   "first_held": 3.5981249999999996,
+   "return_ratio": 0.6643219068346399,
+   "burst": 39.93347338935575,
+   "shuffled_cue": 6.740196078431372,
+   "never_seen": 7.352941176470588
+  },
+  "C": {
+   "retention": 27.620663650075414,
+   "pretrained": 26.93250377073906,
+   "stream": 28.308823529411764,
+   "stream_active": 28.308823529411764,
+   "stream_freq": 66.42156862745098,
+   "stream_occ": 36.02941176470588,
+   "stream_one": 12.990196078431373,
+   "first": 37.22203124999999,
+   "first_held": 2.98265625,
+   "return_ratio": 0.7207936839098048,
+   "burst": 44.17892156862745,
+   "shuffled_cue": 6.372549019607843,
+   "never_seen": 6.617647058823529
+  },
+  "D": {
+   "retention": 65.23967760180994,
+   "pretrained": 87.80165912518855,
+   "stream": 42.677696078431374,
+   "stream_active": 42.677696078431374,
+   "stream_freq": 89.95098039215685,
+   "stream_occ": 53.26797385620915,
+   "stream_one": 22.916666666666668,
+   "first": 37.16125,
+   "first_held": 3.3614062500000004,
+   "return_ratio": 0.8517411054704488,
+   "burst": 60.40791316526611,
+   "shuffled_cue": 6.035539215686274,
+   "never_seen": 6.985294117647058
+  },
+  "M": {
+   "retention": 79.52960030165913,
+   "pretrained": 99.99057315233786,
+   "stream": 59.068627450980394,
+   "stream_active": 22.70220588235294,
+   "stream_freq": 98.03921568627452,
+   "stream_occ": 77.61437908496731,
+   "stream_one": 35.416666666666664,
+   "first": 35.443385416666665,
+   "first_held": 0.23671875,
+   "return_ratio": 1.0,
+   "burst": 77.31967787114846,
+   "shuffled_cue": 5.269607843137255,
+   "never_seen": 5.637254901960785
+  },
+  "M_noarchive": {
+   "retention": 61.57616892911011,
+   "pretrained": 99.99057315233786,
+   "stream": 23.16176470588235,
+   "stream_active": 23.16176470588235,
+   "stream_freq": 96.07843137254902,
+   "stream_occ": 23.366013071895424,
+   "stream_one": 4.779411764705881,
+   "first": 35.443385416666665,
+   "first_held": 0.23671875,
+   "return_ratio": 0.7541009193533058,
+   "burst": 69.27521008403362,
+   "shuffled_cue": 5.606617647058823,
+   "never_seen": 5.637254901960785
+  },
+  "flat_lru": {
+   "retention": 79.77469834087482,
+   "pretrained": 99.99057315233786,
+   "stream": 59.55882352941177,
+   "stream_active": 27.113970588235293,
+   "stream_freq": 96.07843137254902,
+   "stream_occ": 79.49346405228759,
+   "stream_one": 35.47794117647059,
+   "first": 35.412708333333335,
+   "first_held": 0.189375,
+   "return_ratio": 1.0,
+   "burst": 47.356442577030805,
+   "shuffled_cue": 5.422794117647058,
+   "never_seen": 5.637254901960785
+  },
+  "flat_strength": {
+   "retention": 79.66746794871796,
+   "pretrained": 99.99057315233786,
+   "stream": 59.344362745098046,
+   "stream_active": 27.787990196078425,
+   "stream_freq": 96.07843137254902,
+   "stream_occ": 78.92156862745098,
+   "stream_one": 35.477941176470594,
+   "first": 35.412708333333335,
+   "first_held": 0.189375,
+   "return_ratio": 1.0,
+   "burst": 80.30462184873949,
+   "shuffled_cue": 5.269607843137254,
+   "never_seen": 5.637254901960785
+  },
+  "harden_at_once": {
+   "retention": 79.37641402714932,
+   "pretrained": 99.99057315233786,
+   "stream": 58.762254901960794,
+   "stream_active": 20.741421568627448,
+   "stream_freq": 97.30392156862746,
+   "stream_occ": 77.20588235294117,
+   "stream_one": 35.294117647058826,
+   "first": 35.412708333333335,
+   "first_held": 0.189375,
+   "return_ratio": 1.0,
+   "burst": 72.74159663865545,
+   "shuffled_cue": 5.514705882352939,
+   "never_seen": 5.637254901960785
+  },
+  "unlimited": {
+   "retention": 79.74406108597286,
+   "pretrained": 99.99057315233786,
+   "stream": 59.497549019607845,
+   "stream_active": 59.497549019607845,
+   "stream_freq": 95.58823529411764,
+   "stream_occ": 79.5751633986928,
+   "stream_one": 35.41666666666667,
+   "first": 35.412708333333335,
+   "first_held": 0.189375,
+   "return_ratio": 1.0,
+   "burst": 81.36379551820727,
+   "shuffled_cue": 5.392156862745097,
+   "never_seen": 5.637254901960785
+  },
+  "M_shuffled_labels": {
+   "retention": 54.590874811463046,
+   "pretrained": 99.99057315233786,
+   "stream": 9.191176470588234,
+   "stream_active": 6.372549019607843,
+   "stream_freq": 13.23529411764706,
+   "stream_occ": 11.111111111111112,
+   "stream_one": 6.740196078431372,
+   "first": 6.003437500000001,
+   "first_held": 0.5207812500000001,
+   "return_ratio": 1.0,
+   "burst": 13.2703081232493,
+   "shuffled_cue": 6.280637254901961,
+   "never_seen": 5.637254901960785
+  },
+  "cap_small": {
+   "retention": 79.56023755656109,
+   "pretrained": 99.99057315233786,
+   "stream": 59.12990196078433,
+   "stream_active": 13.878676470588232,
+   "stream_freq": 96.07843137254902,
+   "stream_occ": 78.51307189542483,
+   "stream_one": 35.35539215686275,
+   "first": 35.412708333333335,
+   "first_held": 0.189375,
+   "return_ratio": 1.0,
+   "burst": 55.4796918767507,
+   "shuffled_cue": 5.606617647058823,
+   "never_seen": 5.637254901960785
+  },
+  "cap_large": {
+   "retention": 79.28450226244344,
+   "pretrained": 99.99057315233786,
+   "stream": 58.578431372549026,
+   "stream_active": 38.69485294117647,
+   "stream_freq": 98.03921568627452,
+   "stream_occ": 76.30718954248367,
+   "stream_one": 35.41666666666667,
+   "first": 35.412708333333335,
+   "first_held": 0.189375,
+   "return_ratio": 1.0,
+   "burst": 78.44012605042016,
+   "shuffled_cue": 5.453431372549019,
+   "never_seen": 5.637254901960785
+  }
+ },
+ "hp": {
+  "B": 0.0003,
+  "D": 0.0003,
+  "M": 0.01,
+  "C": [
+   0.001,
+   1000.0
+  ]
+ },
+ "smoke": false
+}

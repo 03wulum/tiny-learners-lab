@@ -7,6 +7,7 @@ Tiny models (≤ 20 MB) that **learn while they are being used**: from the promp
 | # | Experiment | Verdict | Criteria | One-line finding |
 |---|---|---|---|---|
 | 03 | [Weight-order memory](experiments/03-weight-order-memory): adapt by *reordering* weights, not rewriting them | _pending GPU run_ | – | – |
+| 05 | [Core + flexible weights](experiments/05-core-flex-consolidation): stable core, a small flexible ring, harden what repeats, archive what's replaced | **FAIL** ✨ | 4/5 | Remembered 79.5% vs fine-tune 50.1 (+29.4, bar was +30) and replay 65.2; the archive does the remembering, and one ring ranked by use-strength matches two tiers |
 
 Every experiment pre-registers PASS / FAIL criteria and negative controls before any run, and prints a verdict table (PASS / FAIL / INCONCLUSIVE, plus an optional ✨ INTRIGUING tag that never changes the verdict).
 
